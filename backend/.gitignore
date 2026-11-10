@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### React 빌드 결과물 (npm run build:backend 로 생성)
+src/main/resources/static/

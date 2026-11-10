@@ -1,0 +1,266 @@
+/*
+ * 업무 보드 스타일 (칼럼 · 카드 · 드래그 상태)
+ */
+
+.board {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  height: 100%;
+  padding: 20px 24px 32px;
+  overflow-x: auto;
+}
+
+/* ───────────── 칼럼 ───────────── */
+.column {
+  --status-color: var(--todo);
+  flex: 1 1 0;
+  min-width: 280px;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  background: #f0f0ed;
+  border-radius: var(--radius-lg);
+}
+
+.column--IN_PROGRESS {
+  --status-color: var(--progress);
+}
+
+.column--DONE {
+  --status-color: var(--done);
+}
+
+.column__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 10px 8px 14px;
+}
+
+.column__title {
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--text);
+}
+
+.column__count {
+  font-size: 13px;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.column__add {
+  margin-left: auto;
+  width: 26px;
+  height: 26px;
+}
+
+.column__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 80px;
+  padding: 4px 8px 8px;
+  overflow-y: auto;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  transition: background 0.12s;
+}
+
+/* 카드를 빈 칼럼 위로 가져왔을 때 */
+.column__body.is-over {
+  background: rgba(91, 91, 214, 0.06);
+}
+
+.column__empty {
+  display: grid;
+  place-items: center;
+  height: 64px;
+  border: 1.5px dashed var(--border-strong);
+  border-radius: var(--radius);
+  color: var(--text-3);
+  font-size: 13px;
+}
+
+.column__add-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-3);
+  font-size: 13px;
+  text-align: left;
+}
+
+.column__add-row:hover {
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--text-2);
+}
+
+/* 상태 점 (칼럼 헤더 · 배지 공용) */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--status-color, var(--todo));
+}
+
+/* ───────────── 카드 ───────────── */
+.task-card-wrap {
+  touch-action: manipulation;
+  border-radius: var(--radius);
+}
+
+/* 드래그 중 원래 자리에 남는 자리표시 */
+.task-card-wrap.is-dragging .task-card {
+  opacity: 0.4;
+  box-shadow: none;
+}
+
+.task-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 12px 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  cursor: grab;
+  user-select: none;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+
+.task-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+/* 마우스를 따라다니는 복제 카드 */
+.task-card.is-overlay {
+  cursor: grabbing;
+  transform: rotate(1.5deg);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--border-strong);
+}
+
+.task-card__title {
+  font-size: 14px;
+  font-weight: 550;
+  line-height: 1.45;
+  color: var(--text);
+  word-break: break-all;
+}
+
+.task-card__desc {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-2);
+}
+
+.task-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.task-card__assignee {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.task-card__assignee-name {
+  font-size: 12px;
+  color: var(--text-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.status-badge {
+  --status-color: var(--todo);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.status-badge--IN_PROGRESS {
+  --status-color: var(--progress);
+}
+
+.status-badge--DONE {
+  --status-color: var(--done);
+}
+
+/* ───────────── 로딩 / 에러 ───────────── */
+.column--skeleton {
+  gap: 10px;
+  padding: 14px 10px;
+}
+
+.skeleton {
+  border-radius: var(--radius);
+  background: linear-gradient(90deg, #e9e9e6 25%, #f3f3f1 50%, #e9e9e6 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite;
+}
+
+.skeleton--title {
+  width: 40%;
+  height: 16px;
+}
+
+.skeleton--card {
+  height: 76px;
+}
+
+@keyframes shimmer {
+  to { background-position: -200% 0; }
+}
+
+.board-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 80px 24px;
+  color: var(--text-2);
+  text-align: center;
+}
+
+/* ───────────── 반응형 ───────────── */
+@media (max-width: 768px) {
+  /* 모바일: 칼럼을 화면 폭 85%로 두고 좌우로 스와이프 (칼럼 단위로 딱딱 멈춤) */
+  .board {
+    gap: 12px;
+    padding: 12px;
+    scroll-snap-type: x mandatory;
+  }
+
+  .column {
+    flex: 0 0 85%;
+    min-width: 0;
+    scroll-snap-align: center;
+  }
+}

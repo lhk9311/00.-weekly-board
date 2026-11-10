@@ -6,13 +6,20 @@ spring:
     name: weekly-board
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/weekly_board
-    username: postgres
+    # 환경변수가 있으면 그 값을, 없으면 로컬 기본값을 사용한다. (Cafe24 배포 시 환경변수로 교체)
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/weekly_board}
+    username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
+
+  # 애플리케이션 시작 시 resources/schema.sql 실행
+  # (CREATE TABLE IF NOT EXISTS 라서 기존 데이터는 유지된다)
+  sql:
+    init:
+      mode: always
+      encoding: UTF-8
 
 mybatis:
   mapper-locations: classpath:mapper/**/*.xml
   configuration:
     map-underscore-to-camel-case: true
-

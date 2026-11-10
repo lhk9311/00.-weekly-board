@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 업무(task) 테이블 SQL -->
+<mapper namespace="com.weeklyboard.backend.task.TaskMapper">
+
+    <!-- 조회 컬럼 공통: sort_order 를 position 으로 별칭 -->
+    <sql id="columns">
+        id, title, assignee, description, status,
+        sort_order AS position,
+        created_at, updated_at
+    </sql>
+
+    <select id="findAll" resultType="com.weeklyboard.backend.task.Task">
+        SELECT <include refid="columns"/>
+        FROM task
+        ORDER BY sort_order, id
+    </select>
+
+    <select id="findById" resultType="com.weeklyboard.backend.task.Task">
+        SELECT <include refid="columns"/>
+        FROM task
+        WHERE id = #{id}
+    </select>
+
+    <select id="nextPosition" resultType="int">
+        SELECT COALESCE(MAX(sort_order) + 1, 0)
+        FROM task
+        WHERE status = #{status}
+    </select>
+
+    <select id="countByStatus" resultType="int">
+        SELECT COUNT(*)
+        FROM task
+        WHERE status = #{status}
+          AND id &lt;&gt; #{excludeId}
+    </select>
+
+    <!-- useGeneratedKeys: INSERT 후 생성된 id 를 Task.id 에 채워준다 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO task (title, assignee, description, status, sort_order)
+        VALUES (#{title}, #{assignee}, #{description}, #{status}, #{position})
+    </insert>
+
+    <update id="update">
+        UPDATE task
+        SET title       = #{title},
+            assignee    = #{assignee},
+            description = #{description},
+            status      = #{status},
+            sort_order  = #{position},
+            updated_at  = now()
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM task WHERE id = #{id}
+    </delete>
+
+    <!-- 빠진 자리 뒤의 카드들을 한 칸씩 당김 -->
+    <update id="shiftUpAfter">
+        UPDATE task
+        SET sort_order = sort_order - 1
+        WHERE status = #{status}
+          AND sort_order &gt; #{position}
+          AND id &lt;&gt; #{excludeId}
+    </update>
+
+    <!-- 들어갈 자리부터 카드들을 한 칸씩 밈 -->
+    <update id="shiftDownFrom">
+        UPDATE task
+        SET sort_order = sort_order + 1
+        WHERE status = #{status}
+          AND sort_order &gt;= #{position}
+          AND id &lt;&gt; #{excludeId}
+    </update>
+
+    <update id="updatePosition">
+        UPDATE task
+        SET status     = #{status},
+            sort_order = #{position},
+            updated_at = now()
+        WHERE id = #{id}
+    </update>
+
+</mapper>

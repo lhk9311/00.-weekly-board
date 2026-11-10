@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 주간보고(weekly_report) 테이블 SQL -->
+<mapper namespace="com.weeklyboard.backend.report.WeeklyReportMapper">
+
+    <select id="findByWeekStart" resultType="com.weeklyboard.backend.report.WeeklyReport">
+        SELECT week_start, content, updated_at
+        FROM weekly_report
+        WHERE week_start = #{weekStart}
+    </select>
+
+    <!--
+        week_start 는 UNIQUE 이므로, 이미 있으면 충돌(CONFLICT)이 나고
+        DO UPDATE 절이 실행되어 내용만 덮어쓴다.
+    -->
+    <insert id="upsert">
+        INSERT INTO weekly_report (week_start, content)
+        VALUES (#{weekStart}, #{content})
+        ON CONFLICT (week_start)
+        DO UPDATE SET content    = EXCLUDED.content,
+                      updated_at = now()
+    </insert>
+
+</mapper>
